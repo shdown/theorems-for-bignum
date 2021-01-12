@@ -1,0 +1,235 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+
+\makeatletter
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\newcommand{\floor}[1] {\lfloor #1 \rfloor}
+
+\title{Theorems for long division and root extraction}
+\author{Viktor Krapivensky}
+\date{%
+    \today
+}
+
+\begin{document}
+
+\maketitle
+
+\section{Notations}
+
+$\mathbb{N} = \{0, 1, 2, \ldots\}.$
+
+\section{Three-by-two theorem}
+
+This theorem is extremely useful for basecase division.
+
+\begin{theorem}[three-by-two]
+    Fix $B \in \mathbb{N},$ $B > 1,$ the base of our positional number system.
+    Fix also numbers $x \in \mathbb{R},$ $y \in \mathbb{R}$ such that:
+    \begin{itemize}
+      \item $0 \le x < B^3;$
+      \item $B \le y < B^2;$
+      \item $x/y < B.$
+    \end{itemize}
+    Define:
+    \begin{itemize}
+      \item $q = \floor{\frac{x}{y}},$ the true quotient;
+      \item $q_e = \floor{\frac{\floor x}{\floor y}},$ our estimate of the quotient.
+    \end{itemize}
+    Then either $(q = q_e)$ or $(q = q_e - 1).$
+\end{theorem}
+\begin{proof}
+    \begin{lemma}
+        $q \le q_e.$
+    \end{lemma}
+    \begin{proof}
+        Define $\delta = x - \floor{x};$
+        note that $0 \le \delta < 1.$
+
+        We have $\frac{x}{y} \le \frac{x}{\floor{y}} = \frac{\floor{x} + \delta}{\floor{y}}.$
+        Then $q = \floor{\frac{x}{y}} \le \floor{\frac{\floor{x} + \delta}{\floor{y}}}.$
+
+        We now want to prove $\floor{\frac{\floor{x} + \delta}{\floor{y}}} = \floor{\frac{\floor x}{\floor y}}.$
+        Since $\delta < 1,$ for any integers $M, N, K,$ the following holds: $(M < KN) \implies ((M + \delta) < KN).$
+
+        Substitute $M = \floor{x},$ $N = \floor{y},$ $K = \floor{\frac{M}{N}}.$
+    \end{proof}
+
+    \begin{lemma}
+    \label{lemma:floorx_bound}
+        $\floor{x} < B (\floor{y} + 1).$
+    \end{lemma}
+    \begin{proof}
+        $\floor{x} \le x < By < B(\floor{y} + 1).$
+    \end{proof}
+
+    Define now the following values:
+    \begin{itemize}
+        \item $u = \floor{x};$
+        \item $v = \floor{y};$
+        \item $q_{\max} = \frac{u+1}{v};$
+        \item $q_{\min} = \frac{u}{v+1}.$
+    \end{itemize}
+
+    \begin{lemma}
+    \label{lemma:bounds}
+        The following bounds hold:
+        \begin{enumerate}
+            \item $q_{\max} - \frac{u}{v} \le \frac{1}{B};$
+            \item $\frac{u}{v} - q_{\min} < 1.$
+        \end{enumerate}
+    \end{lemma}
+    \begin{proof}
+        \begin{enumerate}
+            \item $\frac{u+1}{v} - \frac{u}{v} = \frac{1}{v} \le \frac{1}{B};$
+
+            \item $\frac{u}{v} - \frac{u}{v+1} = \frac{u}{v(v+1)}.$
+            By lemma~\ref{lemma:floorx_bound}, $u < B(v+1),$ so
+            $$\tfrac{u}{v} - q_{\min} < \tfrac{B(v+1)}{v(v+1)} = B/v \le 1.$$
+        \end{enumerate}
+    \end{proof}
+
+    \begin{lemma}
+        $q \ge q_e - 1.$
+    \end{lemma}
+    \begin{proof}
+        We have:
+        \begin{itemize}
+            \item $q_{\min} < \frac{x}{y} < q_{\max};$
+            \item $q_{\min} < \frac{u}{v} < q_{\max}.$
+        \end{itemize}
+        Taking floor of both sides of these inequalities, we get:
+        \begin{itemize}
+            \item $\floor{q_{\min}} \le q \le \floor{q_{\max}};$
+            \item $\floor{q_{\min}} \le q_e \le \floor{q_{\max}}.$
+        \end{itemize}
+        By lemma~\ref{lemma:bounds}, $q_{\max} - q_{\min} < 1 + \frac{1}{B} < 2.$ This means that
+        $\floor{q_{\max}} - \floor{q_{\min}}$ is either 0, 1, or 2.
+        We are only interested in the case of it being $2,$ as in other cases $(q \ge q_e-1)$ holds automatically.
+
+        Suppose $\floor{q_{\max}} - \floor{q_{\min}} = 2$ and $q_e - q = 2.$ Then,
+        \begin{itemize}
+            \item $\floor{q_{\max}} = q_e = \floor{\frac{u}{v}},$ which implies $\frac{u}{v} \ge q_e = q + 2;$
+            \item $\floor{q_{\min}} = q,$ which implies $q_{\min} < q + 1.$
+        \end{itemize}
+        Together, these statements imply $\frac{u}{v} - q_{\min} > 1,$ contradicting lemma~\ref{lemma:bounds}.
+    \end{proof}
+\end{proof}
+
+\section{Approximation of inverse theorem}
+
+This theorem is useful for calculating the inverse of a number with Netwon's method;
+namely, it tells us how to find the initial approximation of the inverse.
+
+\begin{theorem}[approximation of inverse]
+    Fix $B \in \mathbb{N},$ $B > 1,$ the base of our positional number system.
+    Fix then $n \in \mathbb{N},$ $n > 0,$ the number of words in our initial approximation.
+    Fix a number $x \in \mathbb{R}$ such that $B^n \le x < B^{n+1}.$
+    Define:
+    \begin{itemize}
+      \item $r = \frac{B^{2n}}{x},$ the true inverse (scaled up by $2n$ places);
+      \item $r_e = \floor{\frac{B^{2n}}{\floor{x} + 1}},$ our estimate of the scaled-up inverse.
+    \end{itemize}
+    Then:
+    \begin{itemize}
+        \item $r-2 < r_e < r;$
+        \item $B^{n-1} \le r_e < B^n.$
+    \end{itemize}
+\end{theorem}
+\begin{proof}
+    $r_e < r$ is trivial: we increased the denominator ($\floor{x}+1 > x$) and then took floor of the fraction.
+
+    Define now the following values:
+    \begin{itemize}
+        \item $u = \floor{x};$
+        \item $r' = \frac{B^{2n}}{u + 1}.$
+    \end{itemize}
+    Note that $r_e = \floor{r'}.$
+    Then $r - r' = \frac{B^{2n}}{u(u+1)} \le \frac{B^{2n}}{B^{2n} + B^n} < 1.$
+    Now we have $$r - r_e = (r - r') + (r' - \floor{r'}) < 1 + 1 = 2.$$
+
+    We can prove $B^{n-1} \le r_e < B^n$ by substituting the maximum and minimum possible
+    values of $\floor{x}+1$ into $r_e = \floor{\frac{B^{2n}}{\floor{x}+1}}.$
+    The maximum possible value, $B^{n+1},$ gives us $r_e \ge B^{n-1};$
+    and the minumum possible value, $B^{n}+1,$ gives us $r_e \le B^{n} - 1.$
+\end{proof}
+
+\section{Root extraction}
+
+We are given $d \in \mathbb{N}$ and root order $n \in \mathbb{N}, n \ge 2.$
+We need to calculate $\floor{\sqrt[n]{d}}.$
+
+Define the ``true'' root $\xi = \sqrt[n]{d}.$
+We are going to iterate $y \mapsto \Phi(y),$ where
+$$\Phi(y) = \tfrac{1}{n} \big( \tfrac{d}{y^{n-1}} + (n-1) \cdot y \big).$$
+
+If $y = \xi \cdot \delta,$ then $\Phi(y) = \xi \cdot \varphi(\delta),$
+where $$\varphi(x) = \frac{1 + (n-1)x^n}{n x^{n-1}}.$$
+
+\begin{theorem}[icky]
+    $1 < \varphi(x) < x$ for $x > 1.$
+\end{theorem}
+\begin{proof}
+
+We have
+$$\varphi(x) < x \Leftrightarrow 1 + (n-1)x^n < n x^n \Leftrightarrow 1 - x^n < 0.$$
+Now we will prove $\varphi(x) > 1.$
+
+$\frac{1 + (n-1)x^n}{n x^{n-1}} > 1 \Leftrightarrow (1 + \varepsilon)^{n-1}(\varepsilon(n-1) - 1) > -1,$
+where $\varepsilon = x - 1 > 0.$
+
+Substituting $\lambda = \varepsilon(n-1) > 0$ and $m = n-1,$ we get
+$$(1 + \tfrac{\lambda}{m})^m (\lambda - 1) > -1.$$
+
+The sequence $E_m = (1 + \tfrac{\lambda}{m})^m$ increases monotonically for $\lambda > 0,$
+and $\lim\limits_{m \to \infty} E_m = e^{\lambda}.$
+This means $0 < (1 + \tfrac{\lambda}{m})^m < e;$ we are now going to prove
+$$e^{\lambda} (\lambda - 1) > -1$$ for $\lambda > 0.$
+
+The derivative $\frac{\mathrm{d}}{\mathrm{d} \lambda} e^{\lambda}(\lambda - 1) = e^{\lambda} \cdot \lambda$
+is positive for $\lambda > 0;$ and $e^\lambda (\lambda - 1) = -1$ for $\lambda = 0.$
+
+\end{proof}
+
+\begin{theorem}[root extraction]
+    Consider now the following process:
+    we start with an arbitrary integer $y_0 \ge \xi,$ and then,
+    while $y_i > \xi,$ put $y_{i+1} = \floor{\Phi(y_i)}.$
+
+    This process will terminate at some finite step $k \ge 0$ with $y_k = \floor{\xi}.$
+\end{theorem}
+\begin{proof}
+
+Note that $\Phi(y) = \xi \varphi(y / \xi).$
+
+\begin{lemma}
+    $\floor{\Phi(y_i)} < y_i$ for any integer $y_i > \xi.$
+\end{lemma}
+\begin{proof}
+    $\floor{\Phi(y_i)} \le \Phi(y_i) < y_i.$
+\end{proof}
+
+\begin{lemma}
+    If, for some integer $y_i,$ we have $y_i > \xi$ and $y_{i+1} = \floor{\Phi(y_i)} \le \xi,$ then
+    $y_{i+1} = \floor{\xi}.$
+\end{lemma}
+\begin{proof}
+    We have $y_{i+1} = \floor{\Phi(y_i)} \le \xi < \Phi(y_i).$
+\end{proof}
+
+\end{proof}
+
+Note that $(y > \xi) \Leftrightarrow (y^n > d),$
+and $$\floor{\Phi(y)} = \floor{ ( \floor{ d / {y}^{n-1} } + (n-1) \cdot y ) / n }.$$
+
+\end{document}
