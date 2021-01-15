@@ -62,7 +62,7 @@ This theorem is extremely useful for basecase division.
         We now want to prove $\floor{\frac{\floor{x} + \delta}{\floor{y}}} = \floor{\frac{\floor x}{\floor y}}.$
         Since $\delta < 1,$ for any integers $M, N, K,$ the following holds: $(M < KN) \implies ((M + \delta) < KN).$
 
-        Substitute $M = \floor{x},$ $N = \floor{y},$ $K = \floor{\frac{M}{N}}.$
+        Substitute $M = \floor{x},$ $N = \floor{y},$ $K = \floor{\frac{M}{N}} + 1.$
     \end{proof}
 
     \begin{lemma}
@@ -170,7 +170,8 @@ We are given $d \in \mathbb{N}$ and root order $n \in \mathbb{N}, n \ge 2.$
 We need to calculate $\floor{\sqrt[n]{d}}.$
 
 Define the ``true'' root $\xi = \sqrt[n]{d}.$
-We are going to iterate $y \mapsto \Phi(y),$ where
+Using unmodified Newton's method,
+we are going to iterate $y \mapsto \Phi(y),$ where
 $$\Phi(y) = \tfrac{1}{n} \big( \tfrac{d}{y^{n-1}} + (n-1) \cdot y \big).$$
 
 If $y = \xi \cdot \delta,$ then $\Phi(y) = \xi \cdot \varphi(\delta),$
